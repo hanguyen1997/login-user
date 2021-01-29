@@ -3,7 +3,7 @@
  * Fuel is a fast, lightweight, community driven PHP 5.4+ framework.
  *
  * @package    Fuel
- * @version    1.8.2
+ * @version    1.9-dev
  * @author     Fuel Development Team
  * @license    MIT License
  * @copyright  2010 - 2019 Fuel Development Team
@@ -154,7 +154,7 @@ return array(
 	 *  PHP set_locale() setting. Use null to not set.
 	 */
 
-	'locale' => 'vi-VN',
+	// 'locale' => 'en_US',
 
 	/**
 	 * -------------------------------------------------------------------------
@@ -180,7 +180,8 @@ return array(
 	 *  Change the server's default timezone. This is optional.
 	 */
 
-	 'default_timezone' => 'Asia/Ho_Chi_Minh',
+	// 'default_timezone' => null,
+
 	/**
 	 * -------------------------------------------------------------------------
 	 *  Logging threshold.

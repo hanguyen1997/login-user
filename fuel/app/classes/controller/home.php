@@ -111,16 +111,13 @@ class Controller_Home extends Controller
 		$user = DB::select()->from('users')->where('user_email', $user_email)->where('user_password', md5($user_password))->execute()->as_array();
 		if($user != null) 
 		{
-
 			$user_id = $user[0]['id'];
 			$user_email = $user[0]['user_email'];
 
-			// Session::instance()->rotate();
-			// Session::set('user_id', $user_id);
+			Session::set('user_id', $user_id);
 			Session::set('user_email', $user_email);
-			
-
-			Response::redirect('user/index');
+			Session::set('message', "login success");
+			return Response::redirect('user/index');
 		}
 		/*end: if($user->as_array() != null)*/
 	}
@@ -129,7 +126,9 @@ class Controller_Home extends Controller
 	/*check out account*/
 	public function action_logout()
 	{
-		
+		Session::set('user_id', "");
+		Session::set('user_email', "");
+
 		/*return view*/
 		return Response::forge(View::forge('home/login'));
 	}

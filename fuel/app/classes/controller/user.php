@@ -3,9 +3,22 @@ use Fuel\Core\Session;
 
 class Controller_User extends Controller
 {
+	/*check session user*/
+	public function action_auth($user_id){
+		if($user_id == "") 
+		{
+			Session::set('message', "please login");
+			return Response::redirect('login');
+		}
+		/*end: if($user_id == "")*/
+	}
+	/*end: function action_auth()*/
+
 	/*list user*/
 	public function action_index()
 	{
+		$this->action_auth(Session::get('user_id'));
+
 		$email_search = Input::post('email_search');
 		$pagination = Pagination::forge('user/index', array(
 		    'pagination_url' => Uri::create('user/index'),
@@ -26,36 +39,18 @@ class Controller_User extends Controller
 		if($email_search  != "")
 		{
 			/*query sql*/
-			$users = DB::select('*')
-		                        ->from('users')
-		                        ->where('user_email', 'like', '%'.$email_search.'%')
-		                        ->limit($pagination->per_page)
-		                        ->offset($pagination->offset)
-		                        ->execute()
-		                        ->as_array();
+			$users = DB::select('*')->from('users')->where('user_email', 'like', '%'.$email_search.'%')->limit($pagination->per_page)->offset($pagination->offset)->execute()->as_array();
 		}
 		else{ 
 			/*query sql*/
-			$users = DB::select('*')
-		                        ->from('users')
-		                        ->limit($pagination->per_page)
-		                        ->offset($pagination->offset)
-		                        ->execute()
-		                        ->as_array();
+			$users = DB::select('*')->from('users')->limit($pagination->per_page)->offset($pagination->offset)->execute()->as_array();
 		}
-
-		// echo DB::last_query();
-		// exit;
-
-		/*send data view by content*/
+		// echo if($email_search  != "");
+		
+		/*send data view */
         $view->content = $users;
-
-        /*get user_name by session*/
         $view->user_email = Session::get('user_email');
-        
         $view->email_search = $email_search;
-
-        /*load phân trang*/
         $view->pagination = $pagination->render();
         return $view;
 	}
@@ -64,6 +59,9 @@ class Controller_User extends Controller
 	/*form add and edit user*/
 	public function action_form($id_user)
 	{	
+		/*check login*/
+		$this->action_auth(Session::get('user_id'));
+
 		/*load view*/		
 		$view = View::forge('user/form', null , false);
 		$view->content = array();
@@ -91,34 +89,34 @@ class Controller_User extends Controller
 	/*get data form edit or add user*/
 	public function action_get_data()
 	{	
+		/*check login*/
+		$this->action_auth(Session::get('user_id'));
+
+		$phone = Input::post('phone');
+		$user_name = Input::post('user_name');
+		$gender = Input::post('gender');
+		$user_password = Input::post('user_password');
+		$id = Input::post('id');
+		$user_email = Input::post('user_email');
+
+		/*validate data*/
 		$val = Validation::forge();
 	  	$val->add('phone')->add_rule('required')->add_rule('numeric_min', 10000000)->add_rule('numeric_max', 999999999999);;
 	  	$val->add('user_name')->add_rule('required')->add_rule('min_length', 3)->add_rule('max_length', 20);
 	  	$val->add('gender')->add_rule('required');
 
-		if(Input::post('id') != "")
+		if($id != "")
 		{
 			/*update user*/
-			if(Input::post('user_password') != "")
+			if($user_password != "")
 			{
 				/*update charget password*/
 				$val->add('user_password')->add_rule('required')->add_rule('min_length', 8)->add_rule('max_length', 20);
 				if($val->run())
 				{
 					/*check password vs cofim password*/
-					if(Input::post('user_password') != Input::post('check_password')) return Response::redirect('user/form/'.Input::post('id'));
-					
-					/*query update*/
-					DB::update('users')->set(array(
-									        'phone'  => Input::post('phone'),
-									        'user_name' => Input::post('user_name'),
-									        'gender' => Input::post('gender'),
-									        'user_password' => md5(Input::post('user_password')),
-									    ))
-									    ->where('id', '=', Input::post('id'))
-									    ->execute();
-
-					return Response::redirect('user/index');
+					if($user_password != Input::post('check_password')) return Response::redirect('user/form/'.$id);
+					$this->action_edit_charge_password($phone , $user_name, $gender, $user_password, $id);
 				}
 				/*end: if($val->run())*/
 			}
@@ -127,20 +125,19 @@ class Controller_User extends Controller
 				/*update no change password*/
 				if($val->run())
 				{
-					DB::update('users')->set(array(
-									        'phone'  => Input::post('phone'),
-									        'user_name' => Input::post('user_name'),
-									        'gender' => Input::post('gender'),
-									    ))
-									    ->where('id', '=', Input::post('id'))
-									    ->execute();
+					DB::update('users')->set(array('phone'  => $phone ,'user_name' => $user_name,'gender' => $gender))->where('id', '=', $id)->execute();
+					
+					/*notify success*/
+					Session::set('message', "edit user success");
 					return Response::redirect('user/index');
 				}
 				/*end: if($val->run())*/
 			}
-			// end: if(Input::post('user_password') != "") 
-
-			return Response::redirect('user/form/'.Input::post('id'));;
+			// end: if($user_password != "") 
+			
+			/*notify error*/
+			Session::set('message', "create user error");
+			return Response::redirect('user/form/'.$id);;
 		}
 		else{
 			/*create user*/
@@ -149,28 +146,51 @@ class Controller_User extends Controller
 			if($val->run())
 			{
 				/*check password*/
-				if(Input::post('user_password') != Input::post('check_password'))  return Response::redirect('user/form/add');
+				if($user_password != Input::post('check_password'))  return Response::redirect('user/form/add');
 				
-				DB::insert('users')->set(array(
-									    'user_name' => Input::post('user_name'),
-									    'user_email' => Input::post('user_email'),
-									    'user_password' => md5(Input::post('user_password')),
-									    'phone'  => Input::post('phone'),
-									    'gender' => Input::post('gender'),
-									))->execute();
-				return Response::redirect('user/index');;
+				$this->action_add($user_name, $user_email, $user_password, $phone , $gender);
 			}
 			/*end: if($val->run())*/
 		}
-		/*end: if(Input::post('id') != "")*/
+		/*end: if($id != "")*/
 
+		/*notify error*/
+		Session::set('message', "create user error");
 		return Response::redirect('user/form/add');
 	}
 	/*end: function action_edit($id_user)*/
 
+	public function action_add($user_name, $user_email, $user_password, $phone, $gender)
+	{
+		DB::insert('users')->set(array(
+									    'user_name' => $user_name,
+									    'user_email' => $user_email,
+									    'user_password' => md5($user_password),
+									    'phone'  => $phone,
+									    'gender' => $gender,
+									))->execute();
+				/*notify success*/
+				Session::set('message', "create user success");
+				return Response::redirect('user/index');;
+	}
+	/*end: action_add($user_name, $user_email, $user_password, $phone, $gender)*/
+
+	public function action_edit_charge_password($phone, $user_name, $gender, $user_password, $id)
+	{
+		/*query update*/
+		DB::update('users')->set(array( 'phone'  => $phone, 'user_name' => $user_name, 'gender' => $gender, 'user_password' => md5($user_password), )) ->where('id', '=', $id)->execute();
+		/*notify success*/
+		Session::set('message', "edit user success");
+		return Response::redirect('user/index');
+	}
+
+
 	/*delete acccount by id*/
 	public function action_delete($id_user)
 	{
+		/*check login*/
+		$this->action_auth(Session::get('user_id'));
+
 		DB::delete('users')->where('id', $id_user)->execute(); 
 		
 		/* message sussec and redirect page list user*/
@@ -180,6 +200,7 @@ class Controller_User extends Controller
 
 	public function action_check_email_ajax()
 	{
+
 		$check = "false";
 		if(Input::post('user_email') != "")
 		{

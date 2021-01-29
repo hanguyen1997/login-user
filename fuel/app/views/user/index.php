@@ -27,8 +27,17 @@
 	</style>
 </head>
 <body>
+	
 	<p style="text-align: right;">Hi <?php echo $user_email ?> <a href="<?php echo Uri::create('user/form/add'); ?>">Add new user</a> <button><a href="<?php echo Uri::create('home/logout/'); ?>">Logout</a></button></p>
 	<h1>List user</h1>
+	<?php 
+		/*notify*/
+		if(Session::get('message') != "") {
+			echo "<p style='text-align: center;'>".Session::get('message')."</p>";
+			Session::set('message', "");
+		}
+	?>
+
 	<div class="box-seach">
 		<?php echo Form::open("user/index"); ?>
 		<input type="text" placeholder="Email" name="email_search" value="<?php echo $email_search;?>">

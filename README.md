@@ -1,6 +1,6 @@
 # FuelPHP
 
-* Version: 1.8.2
+* Version: 1.9 [under development]
 * [Website](https://fuelphp.com/)
 * [Release Documentation](https://fuelphp.com/docs)
 * [Release API browser](https://fuelphp.com/api)
@@ -12,7 +12,7 @@
 
 FuelPHP is a fast, lightweight PHP 5.4+ framework. In an age where frameworks are a dime a dozen, we believe that FuelPHP will stand out in the crowd. It will do this by combining all the things you love about the great frameworks out there, while getting rid of the bad.
 
-FuelPHP is fully PHP 7.3 compatible.
+FuelPHP is fully PHP 7 compatible.
 
 ## More information
 
@@ -21,7 +21,8 @@ For more detailed information, see the [development wiki](https://github.com/fue
 ## Development Team
 
 * Harro Verton - Project Manager, Developer ([http://wanwizard.eu/](http://wanwizard.eu/))
-* Emlyn West - Core Developer, ORM
+* Steve West - Core Developer, ORM
+* Márk Sági-Kazár - Developer
 
 ### Want to join?
 
@@ -31,7 +32,6 @@ You can not apply for membership. Start by sending in pull-requests, work on out
 
 ### Alumni
 
-* Márk Sági-Kazár - Developer
 * Frank de Jonge - Developer ([http://frenky.net/](http://frenky.net/))
 * Jelmer Schreuder - Developer ([http://jelmerschreuder.nl/](http://jelmerschreuder.nl/))
 * Phil Sturgeon - Developer ([http://philsturgeon.co.uk](http://philsturgeon.co.uk))

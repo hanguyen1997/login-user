@@ -25,12 +25,22 @@
 	    display: flex;
 	    flex-direction: column;
     }
+    .notify {
+    	text-align: center;
+    	color: red;
+    }
 	</style>
 </head>
 <body>
 	<!-- title -->
 	<h1 style="text-align: center;">Login User</h1>
+	<?php 
+	if(Session::get('message') != "") {
+		echo "<p class='notify'>".Session::get('message')."</p>";
+		Session::set('message', "");
+	}
 
+	?>
 	<!-- form -->
 	<?php echo Form::open("/home/check_login"); ?>
 	  <div class="login">
