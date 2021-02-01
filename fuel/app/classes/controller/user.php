@@ -18,7 +18,6 @@ class Controller_User extends Controller
 	public function action_index()
 	{
 		$this->action_auth(Session::get('user_id'));
-
 		$email_search = Input::post('email_search');
 		$pagination = Pagination::forge('user/index', array(
 		    'pagination_url' => Uri::create('user/index'),
@@ -147,7 +146,6 @@ class Controller_User extends Controller
 			{
 				/*check password*/
 				if($user_password != Input::post('check_password'))  return Response::redirect('user/form/add');
-				
 				$this->action_add($user_name, $user_email, $user_password, $phone , $gender);
 			}
 			/*end: if($val->run())*/
@@ -162,16 +160,24 @@ class Controller_User extends Controller
 
 	public function action_add($user_name, $user_email, $user_password, $phone, $gender)
 	{
-		DB::insert('users')->set(array(
-									    'user_name' => $user_name,
+		$check_user_email = DB::select('user_email')->from('users')->where('user_email', '=', $user_email)->execute();
+		if(($check_user_email->as_array() != null))
+		{
+			/*error message*/
+			Session::set('message', "Email already exists");
+			return Response::redirect('user/form/add');
+		}
+		/*end: if(($check_user_email->as_array() != null))*/
+
+		DB::insert('users')->set(array('user_name' => $user_name,
 									    'user_email' => $user_email,
 									    'user_password' => md5($user_password),
 									    'phone'  => $phone,
 									    'gender' => $gender,
 									))->execute();
-				/*notify success*/
-				Session::set('message', "create user success");
-				return Response::redirect('user/index');;
+		/*notify success*/
+		Session::set('message', "create user success");
+		return Response::redirect('user/index');;
 	}
 	/*end: action_add($user_name, $user_email, $user_password, $phone, $gender)*/
 
@@ -179,10 +185,12 @@ class Controller_User extends Controller
 	{
 		/*query update*/
 		DB::update('users')->set(array( 'phone'  => $phone, 'user_name' => $user_name, 'gender' => $gender, 'user_password' => md5($user_password), )) ->where('id', '=', $id)->execute();
+		
 		/*notify success*/
 		Session::set('message', "edit user success");
 		return Response::redirect('user/index');
 	}
+	/*end: function action_edit_charge_password($phone, $user_name, $gender, $user_password, $id)*/
 
 
 	/*delete acccount by id*/
@@ -190,7 +198,6 @@ class Controller_User extends Controller
 	{
 		/*check login*/
 		$this->action_auth(Session::get('user_id'));
-
 		DB::delete('users')->where('id', $id_user)->execute(); 
 		
 		/* message sussec and redirect page list user*/
@@ -200,7 +207,6 @@ class Controller_User extends Controller
 
 	public function action_check_email_ajax()
 	{
-
 		$check = "false";
 		if(Input::post('user_email') != "")
 		{
@@ -211,8 +217,12 @@ class Controller_User extends Controller
 				$check_user_email = DB::select('user_email')->from('users')->where('user_email', '=', Input::post('user_email') )->execute()->as_array();
 				if($check_user_email == null) $check = "true";
 			}
+			/*end: if($val->run())*/
 		}
+		/*end: if(Input::post('user_email') != "")*/
+
 		return $check;
 	}
+	/*end: public function action_check_email_ajax()*/
 }
 /*end: class Controller_Home extends Controller*/

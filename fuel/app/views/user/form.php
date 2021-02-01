@@ -49,6 +49,12 @@
 	<h1 style="text-align: center;"><?php echo $title; ?></h1>
 
 	<?php 
+		/*notify*/
+		if(Session::get('message') != "") {
+			echo "<p style='text-align: center;'>".Session::get('message')."</p>";
+			Session::set('message', "");
+		}
+
 		$user_email = "";
 		$phone = "";
 		$user_name = "";
