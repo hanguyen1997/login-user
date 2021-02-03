@@ -11,13 +11,32 @@
  */
 
 return array(
+	/**
+	 * -------------------------------------------------------------------------
+	 *  Default route
+	 * -------------------------------------------------------------------------
+	 *
+	 */
+	// 'login' => array('user/login', 'name' => 'login'),
+	'_root_' => array('user/login', 'name' => 'login'),
 
-	'_root_' => 'home/show_login',
-
-	/*home*/
-	'login' => 'home/show_login',
-	'registration' => 'home/show_registration',
-	'check_email' => 'user/check_email_ajax',
+	/**
+	 * -------------------------------------------------------------------------
+	 *  Page not found
+	 * -------------------------------------------------------------------------
+	 *
+	 */
 
 	'_404_' => 'welcome/404',
+
+	/**
+	 * -------------------------------------------------------------------------
+	 *  Example for Presenter
+	 * -------------------------------------------------------------------------
+	 *
+	 *  A route for showing page using Presenter
+	 *
+	 */
+
+	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );
